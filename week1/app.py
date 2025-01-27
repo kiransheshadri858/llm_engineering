@@ -1,16 +1,21 @@
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
-from website import Website
+from webscraper import Website
+from client_open_ai import OpenAIClient
+from client_ollama import OllamaClient
+from llm_client import LLMClient
+
 
 load_dotenv()  # This loads the environment variables from the .env file.
 
-def summarize(url: str) -> str:
+def summarize(url: str, client: LLMClient, model: str) -> str:
     """
-    Fetches content from a URL and generates a summary using OpenAI.
+    Fetches content from a URL and generates a summary using the specified LLM client.
     
     Args:
         url (str): The URL of the website to summarize
+        client (LLMClient): The initialized LLM client to use
+        model (str): The model to use for generation
         
     Returns:
         str: The generated summary
@@ -18,18 +23,6 @@ def summarize(url: str) -> str:
     Raises:
         Exception: If there's an error with website fetching or API communication
     """
-    # Initialize OpenAI client
-    api_key = os.getenv('OPENAI_API_KEY')
-    
-    if (api_key is None or 
-        not api_key.strip() or 
-        ' ' in api_key or 
-        '\t' in api_key or
-        not api_key.startswith('sk-')):
-        raise ValueError("Invalid API key: Key is either None, empty, contains spaces/tabs, or has invalid format.")
-    
-    client = OpenAI(api_key=api_key)
-    
     # Fetch website content
     website = Website(url)
     
@@ -57,16 +50,8 @@ def summarize(url: str) -> str:
         text=website.text
     )
     
-    # Get response from OpenAI
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
-    )
-    
-    return response.choices[0].message.content
+    # Get response from AI client
+    return client.get_completion(system_prompt, user_prompt, model=model) 
 
 # Example usage
 if __name__ == "__main__":
@@ -74,9 +59,39 @@ if __name__ == "__main__":
     print("-----------------")
     url_name = input("Enter the website URL to summarize: ")
     
+    # Display available clients
+    clients = ["openai", "ollama"]
+    for i, client in enumerate(clients, 1):
+        print(f"{i}. {client}")
+    
+    choice = input(f"Enter number (1-{len(clients)}) [default: 1]: ").strip() or "1"
+    client_type = clients[int(choice) - 1] if choice.isdigit() and 1 <= int(choice) <= len(clients) else "openai"
+    
     try:
+        # Initialize AI client and get available models
+        if client_type.lower() == "openai":
+            client = OpenAIClient()
+        elif client_type.lower() == "ollama":
+            client = OllamaClient()
+        else:
+            raise ValueError(f"Unsupported client type: {client_type}")
+        
+        # Get and display available models
+        print(f"\nFetching available models for {client_type}...")
+        available_models = client.list_models()
+        
+        print("\nAvailable models:")
+        for i, model in enumerate(available_models, 1):
+            print(f"{i}. {model}")
+        
+        model_choice = input(f"Enter number (1-{len(available_models)}) [default: 1]: ").strip() or "1"
+        model = (available_models[int(model_choice) - 1] 
+                if model_choice.isdigit() and 1 <= int(model_choice) <= len(available_models) 
+                else available_models[0])
+        
+        print(f"\nSelected model: {model}")
         print("\nFetching and analyzing content...")
-        summary = summarize(url_name)
+        summary = summarize(url_name, client, model)
         print(f"\nWebsite Summary for {url_name}:")
         print("-" * (20 + len(url_name)))
         print(summary)

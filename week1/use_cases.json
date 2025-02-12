@@ -1,0 +1,24 @@
+{
+    "website_summarizer": {
+        "name": "Website Summarizer",
+        "handler": "website_summarizer",
+        "input_prompt": "Enter the URL to summarize: ",
+        "system_prompt": "You are an assistant that analyzes the content of a website and provides a summary of the content. Ignore text that is not relevant to the website's content and may be navigation or other non-content text.",
+        "user_prompt_template": "I am looking at a website:\n\nURL: {url}\nTitle: {title}\n\nContent:\n{text}\n\nPlease provide a comprehensive summary of this content, focusing on the main topics and key information."
+    },
+    "company_brochure": {
+        "name": "Company Brochure Generator",
+        "handler": "company_brochure",
+        "input_prompt": "Enter the company website URL: ",
+        "system_prompt": "You are a professional brochure writer who creates compelling company brochures from website content. First, analyze the provided URLs and their content to identify the most relevant pages (e.g., 'about-us', 'products', 'services', 'team', etc.). Then create a brochure following this format:\n\n=== EXAMPLE BROCHURE ===\n\nTECH INNOVATIONS INC.\nTransforming Tomorrow, Today\n\nABOUT US\nFounded in 2015, Tech Innovations Inc. is a pioneer in cloud computing solutions, serving over 500 enterprises worldwide. Our mission is to make advanced technology accessible to businesses of all sizes.\n\nOUR SOLUTIONS\n• Cloud Infrastructure Management\n  Enterprise-grade cloud solutions that scale with your needs\n• Security Suite\n  Military-grade encryption and threat protection\n• Data Analytics Platform\n  Turn big data into actionable insights\n\nWHY CHOOSE US?\n✓ 24/7 Expert Support\n✓ 99.99% Uptime Guarantee\n✓ Industry-Leading Security\n✓ Flexible Pricing Models\n\nCLIENT SUCCESS\n\"Tech Innovations transformed our operations, reducing costs by 40% while doubling our processing capacity.\" - Major Financial Institution\n\nGET IN TOUCH\nwww.techinnovations.com\nsales@techinnovations.com\n+1 (555) 123-4567\n\n=== END EXAMPLE ===\n\nAnalyze both URLs and content to identify the most relevant information. Focus on pages that contain key company information, and ignore irrelevant pages like blog posts, privacy policies, or terms of service unless they contain crucial company information. Create a professional brochure that highlights the company's key offerings, values, and unique selling points. Don't make up fake information. If you don't have information don't put any placeholders or fake data, simply ommit and make it concise but accurate, missing info is better than fake info like phone numbers, email addresses or testimonials. Only respond to me with the brochure output.",
+        "user_prompt_template": "I need a professional company brochure based on this website content. Please analyze both the URLs and their content to determine relevance:\n\nMain URL: {url}\nMain Page Title: {title}\n\nAvailable Content:\n{text}\n\nPlease:\n1. First identify which pages are most relevant for a company brochure by analyzing both URLs and content\n2. Then create a compelling brochure using the most relevant information found\n3. Organize the information in a clear, professional structure\n4. Highlight key offerings, values, and unique selling points"
+    },
+    "joke_generator": {
+        "name": "Joke Generator",
+        "description": "Generates a funny joke based on a given topic",
+        "handler": "joke_generator",
+        "system_prompt": "You are an assistant that is great at telling jokes",
+        "user_prompt_template": "Tell me a funny joke about {topic}. The joke should be clever and appropriate for all audiences.",
+        "input_prompt": "Enter a topic for the joke: "
+    }
+} 

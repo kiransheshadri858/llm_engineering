@@ -34,19 +34,22 @@ class OllamaClient(LLMClient):
             model (str): Name of the model to check/pull
         """
         try:
+            # Extract just the model name if it includes size info
+            model_name = model.split(" (")[0]
+            
             # Check if model exists
             response = requests.get(f"{self.base_url}/api/tags")
             response.raise_for_status()
             models = [tag['name'] for tag in response.json()['models']]
             
-            if model not in models:
-                print(f"Model {model} not found locally. Pulling from repository...")
+            if model_name not in models:
+                print(f"Model {model_name} not found locally. Pulling from repository...")
                 pull_response = requests.post(
                     f"{self.base_url}/api/pull",
-                    json={"name": model}
+                    json={"name": model_name}
                 )
                 pull_response.raise_for_status()
-                print(f"Successfully pulled {model}")
+                print(f"Successfully pulled {model_name}")
         except requests.RequestException as e:
             raise Exception(f"Error ensuring model availability: {str(e)}")
     
@@ -104,7 +107,7 @@ class OllamaClient(LLMClient):
         Get list of available models from Ollama.
         
         Returns:
-            List[str]: List of model identifiers available locally
+            List[str]: List of model identifiers available for use
             
         Raises:
             Exception: If there's an error in API communication

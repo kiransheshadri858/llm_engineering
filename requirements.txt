@@ -43,3 +43,4 @@ speedtest-cli
 sentence_transformers
 feedparser
 urllib3<2.0
+markdown
